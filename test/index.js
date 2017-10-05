@@ -25,6 +25,14 @@ describe( 'schema mapper', () => {
     assert.deepEqual( kitchenSink, KitchenSink() )
   })
 
+  it( 'array from default', () => {
+    const instance = [ 1, 2, 3 ]
+    const schema = to( instance )
+    const arr = from( schema )
+
+    assert.deepEqual( arr, instance )
+  })
+
   it( 'creates from schema with no defaults', () => {
     const mapper = Mapper({ omitDefault: true })
     const { from, to } = mapper

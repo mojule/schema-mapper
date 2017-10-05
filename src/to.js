@@ -1,6 +1,9 @@
 'use strict'
 
 const is = require( '@mojule/is' )
+const Mapper = require( '@mojule/mapper' )
+
+const clone = Mapper()
 
 const everySame = arr =>
   arr.length > 0 && arr.every( item => item === arr[ 0 ] )
@@ -84,9 +87,9 @@ const arrayObject = ( schema, objects, options ) => {
 
   const type = 'object'
   const properties = Object.keys( propertyValues ).reduce( ( obj, name ) => {
-    const arraySchema = array( propertyValues[ name ], options )
+    const { items: schema } = array( propertyValues[ name ], options )
 
-    obj[ name ] = arraySchema.items || {}
+    obj[ name ] = schema
 
     return obj
   }, {} )
@@ -98,11 +101,11 @@ const arrayObject = ( schema, objects, options ) => {
 }
 
 const Schema = ( type, value, options ) => {
-  const { omitDefault } = options
+  const { omitDefault, mapper } = options
   const schema = { type }
 
   if( !omitDefault ){
-    schema.default = value
+    schema.default = clone( value )
   }
 
   return schema
