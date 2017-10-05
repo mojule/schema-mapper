@@ -7,7 +7,7 @@ const Mapper = require( '@mojule/schema-mapper' )
 
 const { from, to } = Mapper()
 
-const data = {
+let data = {
   name: 'Nik',
   age: 37,
   classes: [ 'foo', 'bar' ]
@@ -47,11 +47,26 @@ const schema = to( data )
 ```
 
 ```javascript
+data = from( schema )
+```
+
+```json
+{
+  "name": "Nik",
+  "age": 37,
+  "classes": [
+    "foo",
+    "bar"
+  ]
+}
+```
+
+```javascript
 const Mapper = require( '@mojule/schema-mapper' )
 
 const { from, to } = Mapper( { omitDefault: true } )
 
-const data = {
+let data = {
   name: 'Nik',
   age: 37,
   classes: [ 'foo', 'bar' ]
@@ -81,13 +96,15 @@ const schema = to( data )
 ```
 
 ```javascript
-const data = from( schema )
+data = from( schema )
 ```
 
 ```json
 {
   "name": "",
   "age": 0,
-  "classes": [ "" ]
+  "classes": [
+    ""
+  ]
 }
 ```
