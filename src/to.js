@@ -122,7 +122,11 @@ const map = {
     const { mapper } = options
 
     const properties = Object.keys( value ).reduce( ( obj, key ) => {
-      obj[ key ] = mapper( value[ key ], options )
+      const property = mapper( value[ key ], options )
+
+      property.name = key
+
+      obj[ key ] = property
 
       return obj
     }, {})
