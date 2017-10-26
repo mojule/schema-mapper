@@ -12,30 +12,15 @@ describe( 'schema mapper', () => {
   it( 'converts to schema', () => {
     const instance = KitchenSink()
     const schema = to( instance )
+
+    console.log( JSON.stringify( schema, null, 2 ) )
+
     const result = tv4.validateMultiple( instance, schema )
 
     assert( result.valid )
   })
 
-  it( 'converts from schema', () => {
-    const instance = KitchenSink()
-    const schema = to( instance )
-    const kitchenSink = from( schema )
-
-    assert.deepEqual( kitchenSink, KitchenSink() )
-  })
-
-  it( 'array from default', () => {
-    const instance = [ 1, 2, 3 ]
-    const schema = to( instance )
-    const arr = from( schema )
-
-    assert.deepEqual( arr, instance )
-  })
-
-  it( 'creates from schema with no defaults', () => {
-    const mapper = Mapper({ omitDefault: true })
-    const { from, to } = mapper
+  it( 'creates from schema', () => {
     const schema = to( KitchenSink() )
     const model = from( schema )
     const result = tv4.validateMultiple( model, schema )

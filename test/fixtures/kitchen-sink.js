@@ -17,7 +17,7 @@ const KitchenSink = () => {
       { foo: 5, bar: 6, baz: 7 },
       { foo: 5, bar: 'foo' }
     ],
-    mixedArray: [ {}, { foo: 1, bar: [] } ],
+    mixedArray: [ {}, { foo: 1, bar: [] }, 'foo', 1 ],
     nestedArray: [ [ [ 1, 2 ], [ 3, 4 ] ], [ [ 5, 6 ], [ 7, 8 ] ] ]
   }
 

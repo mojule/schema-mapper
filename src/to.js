@@ -2,8 +2,16 @@
 
 const is = require( '@mojule/is' )
 const Mapper = require( '@mojule/mapper' )
+const typeMap = require( './type-map' )
 
 const clone = Mapper()
+
+const Schema = ( type, value, options ) => {
+  const { mapper } = options
+  const schema = { type, default: typeMap[ type ] }
+
+  return schema
+}
 
 const everySame = arr =>
   arr.length > 0 && arr.every( item => item === arr[ 0 ] )
@@ -12,6 +20,15 @@ const array = ( value, options ) => {
   const { mapper } = options
 
   const schema = Schema( 'array', value, options )
+
+  if( value.length === 0 )
+    return schema
+
+  if( value.length === 1 ){
+    schema.items = mapper( value[ 0 ], options )
+
+    return schema
+  }
 
   let types = new Set()
   const json = []
@@ -42,7 +59,7 @@ const array = ( value, options ) => {
       return arrayObject( schema, value, options )
 
     schema.items = { type }
-  } else if( length > 1 )  {
+  } else if( length > 1 ){
     // nb this could/should be extended to anyOf
     schema.items = {}
   }
@@ -96,17 +113,6 @@ const arrayObject = ( schema, objects, options ) => {
   required = Array.from( required )
 
   schema.items = { type, properties, required }
-
-  return schema
-}
-
-const Schema = ( type, value, options ) => {
-  const { omitDefault, mapper } = options
-  const schema = { type }
-
-  if( !omitDefault ){
-    schema.default = clone( value )
-  }
 
   return schema
 }

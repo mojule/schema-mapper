@@ -2,6 +2,8 @@
 
 const is = require( '@mojule/is' )
 
+const typeMap = require( './type-map' )
+
 const predicates = {
   stringSchema: value => is.object( value ) && value.type === 'string',
   numberSchema: value => is.object( value ) && value.type === 'number',
@@ -12,22 +14,18 @@ const predicates = {
 }
 
 const map = {
-  stringSchema: value => value.default || '',
-  numberSchema: value => value.default || 0,
-  booleanSchema: value => value.default || false,
-  nullSchema: () => null,
+  stringSchema: value => typeMap.string,
+  numberSchema: value => typeMap.number,
+  booleanSchema: value => typeMap.boolean,
+  nullSchema: () => typeMap.null,
   arraySchema: ( value, options ) => {
-    if( value.default ) return value.default
-
     const { mapper } = options
 
     if( value.items ) return [ mapper( value.items, options ) ]
 
-    return []
+    return typeMap.array
   },
   objectSchema: ( value, options ) => {
-    if( value.default ) return value.default
-
     if( is.object( value.properties ) && !is.empty( value.properties ) ){
       const { mapper } = options
 
@@ -38,7 +36,7 @@ const map = {
       }, {} )
     }
 
-    return {}
+    return typeMap.object
   }
 }
 
