@@ -21,6 +21,8 @@ const array = ( value, options ) => {
 
   const schema = Schema( 'array', value, options )
 
+  schema.items = {}
+
   if( value.length === 0 )
     return schema
 
@@ -31,19 +33,19 @@ const array = ( value, options ) => {
   }
 
   let types = new Set()
-  const json = []
+  const jsonMap = {}
 
-  const schemas = value.map( current => {
+  value.forEach( current => {
     const schema = mapper( current, options )
 
     types.add( schema.type )
-    json.push( JSON.stringify( schema ) )
-
-    return schema
+    jsonMap[ JSON.stringify( schema ) ] = schema
   })
 
-  if( everySame( json ) ){
-    schema.items = JSON.parse( json[ 0 ] )
+  const jsonKeys = Object.keys( jsonMap )
+
+  if( everySame( jsonKeys ) ){
+    schema.items = jsonMap[ jsonKeys[ 0 ] ]
 
     return schema
   }
@@ -52,16 +54,8 @@ const array = ( value, options ) => {
 
   const { length } = types
 
-  if( length === 1 ){
-    const type = types[ 0 ]
-
-    if( type === 'object' )
-      return arrayObject( schema, value, options )
-
-    schema.items = { type }
-  } else if( length > 1 ){
-    // nb this could/should be extended to anyOf
-    schema.items = {}
+  if( length === 1 && types[ 0 ] === 'object' ){
+    return arrayObject( schema, value, options )
   }
 
   return schema
@@ -91,25 +85,23 @@ const arrayObject = ( schema, objects, options ) => {
     })
 
     names.forEach( name => {
-      let values = propertyValues[ name ]
-
-      if( !values ){
-        values = []
-        propertyValues[ name ] = values
-      }
-
-      values.push( obj[ name ] )
+      propertyValues[ name ].push( obj[ name ] )
     })
   })
 
   const type = 'object'
-  const properties = Object.keys( propertyValues ).reduce( ( obj, name ) => {
-    const { items: schema } = array( propertyValues[ name ], options )
 
-    obj[ name ] = schema
+  const properties = Object.keys( propertyValues ).reduce( ( obj, key ) => {
+    // leverage the array function to figure out schemas for the property
+    const { items: property } = array( propertyValues[ key ], options )
+
+    property.name = key
+
+    obj[ key ] = property
 
     return obj
   }, {} )
+
   required = Array.from( required )
 
   schema.items = { type, properties, required }

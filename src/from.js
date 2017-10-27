@@ -4,19 +4,23 @@ const is = require( '@mojule/is' )
 
 const typeMap = require( './type-map' )
 
+const TypedSchemaPredicate = type =>
+  value => is.object( value ) && value.type === type
+
 const predicates = {
-  stringSchema: value => is.object( value ) && value.type === 'string',
-  numberSchema: value => is.object( value ) && value.type === 'number',
-  booleanSchema: value => is.object( value ) && value.type === 'boolean',
-  nullSchema: value => is.object( value ) && value.type === 'null',
-  arraySchema: value => is.object( value ) && value.type === 'array',
-  objectSchema: value => is.object( value ) && value.type === 'object'
+  stringSchema: TypedSchemaPredicate( 'string' ),
+  numberSchema: TypedSchemaPredicate( 'number' ),
+  booleanSchema: TypedSchemaPredicate( 'boolean' ),
+  nullSchema: TypedSchemaPredicate( 'null' ),
+  arraySchema: TypedSchemaPredicate( 'array' ),
+  objectSchema: TypedSchemaPredicate( 'object' ),
+  anySchema: value => is.object( value )
 }
 
 const map = {
-  stringSchema: value => typeMap.string,
-  numberSchema: value => typeMap.number,
-  booleanSchema: value => typeMap.boolean,
+  stringSchema: () => typeMap.string,
+  numberSchema: () => typeMap.number,
+  booleanSchema: () => typeMap.boolean,
   nullSchema: () => typeMap.null,
   arraySchema: ( value, options ) => {
     const { mapper } = options
@@ -37,7 +41,8 @@ const map = {
     }
 
     return typeMap.object
-  }
+  },
+  anySchema: () => typeMap.object
 }
 
 module.exports = { predicates, map }

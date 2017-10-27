@@ -9,23 +9,36 @@ const mapper = Mapper()
 const { from, to } = mapper
 
 describe( 'schema mapper', () => {
-  it( 'converts to schema', () => {
+  it( 'to schema', () => {
     const instance = KitchenSink()
     const schema = to( instance )
-
-    console.log( JSON.stringify( schema, null, 2 ) )
-
     const result = tv4.validateMultiple( instance, schema )
 
     assert( result.valid )
   })
 
-  it( 'creates from schema', () => {
+  it( 'from schema', () => {
     const schema = to( KitchenSink() )
     const model = from( schema )
     const result = tv4.validateMultiple( model, schema )
 
     assert.strictEqual( model.string, '' )
     assert( result.valid )
+  })
+
+  describe( 'from arbitrary schema', () => {
+    it( 'type "array" with no "items" property', () => {
+      const schema = { type: 'array' }
+      const model = from( schema )
+
+      assert.deepEqual( model, [] )
+    })
+
+    it( 'type "any" with additional fields', () => {
+      const schema = { name: 'foo' }
+      const model = from( schema )
+
+      assert.deepEqual( model, {} )
+    })
   })
 })
