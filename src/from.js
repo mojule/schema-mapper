@@ -2,32 +2,34 @@
 
 const is = require( '@mojule/is' )
 
+const typeMap = require( './type-map' )
+
+const TypedSchemaPredicate = type =>
+  value => is.object( value ) && value.type === type
+
 const predicates = {
-  stringSchema: value => is.object( value ) && value.type === 'string',
-  numberSchema: value => is.object( value ) && value.type === 'number',
-  booleanSchema: value => is.object( value ) && value.type === 'boolean',
-  nullSchema: value => is.object( value ) && value.type === 'null',
-  arraySchema: value => is.object( value ) && value.type === 'array',
-  objectSchema: value => is.object( value ) && value.type === 'object'
+  stringSchema: TypedSchemaPredicate( 'string' ),
+  numberSchema: TypedSchemaPredicate( 'number' ),
+  booleanSchema: TypedSchemaPredicate( 'boolean' ),
+  nullSchema: TypedSchemaPredicate( 'null' ),
+  arraySchema: TypedSchemaPredicate( 'array' ),
+  objectSchema: TypedSchemaPredicate( 'object' ),
+  anySchema: value => is.object( value )
 }
 
 const map = {
-  stringSchema: value => value.default || '',
-  numberSchema: value => value.default || 0,
-  booleanSchema: value => value.default || false,
-  nullSchema: () => null,
+  stringSchema: () => typeMap.string,
+  numberSchema: () => typeMap.number,
+  booleanSchema: () => typeMap.boolean,
+  nullSchema: () => typeMap.null,
   arraySchema: ( value, options ) => {
-    if( value.default ) return value.default
-
     const { mapper } = options
 
     if( value.items ) return [ mapper( value.items, options ) ]
 
-    return []
+    return typeMap.array
   },
   objectSchema: ( value, options ) => {
-    if( value.default ) return value.default
-
     if( is.object( value.properties ) && !is.empty( value.properties ) ){
       const { mapper } = options
 
@@ -38,8 +40,9 @@ const map = {
       }, {} )
     }
 
-    return {}
-  }
+    return typeMap.object
+  },
+  anySchema: () => typeMap.object
 }
 
 module.exports = { predicates, map }

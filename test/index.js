@@ -9,7 +9,7 @@ const mapper = Mapper()
 const { from, to } = mapper
 
 describe( 'schema mapper', () => {
-  it( 'converts to schema', () => {
+  it( 'to schema', () => {
     const instance = KitchenSink()
     const schema = to( instance )
     const result = tv4.validateMultiple( instance, schema )
@@ -17,30 +17,28 @@ describe( 'schema mapper', () => {
     assert( result.valid )
   })
 
-  it( 'converts from schema', () => {
-    const instance = KitchenSink()
-    const schema = to( instance )
-    const kitchenSink = from( schema )
-
-    assert.deepEqual( kitchenSink, KitchenSink() )
-  })
-
-  it( 'array from default', () => {
-    const instance = [ 1, 2, 3 ]
-    const schema = to( instance )
-    const arr = from( schema )
-
-    assert.deepEqual( arr, instance )
-  })
-
-  it( 'creates from schema with no defaults', () => {
-    const mapper = Mapper({ omitDefault: true })
-    const { from, to } = mapper
+  it( 'from schema', () => {
     const schema = to( KitchenSink() )
     const model = from( schema )
     const result = tv4.validateMultiple( model, schema )
 
     assert.strictEqual( model.string, '' )
     assert( result.valid )
+  })
+
+  describe( 'from arbitrary schema', () => {
+    it( 'type "array" with no "items" property', () => {
+      const schema = { type: 'array' }
+      const model = from( schema )
+
+      assert.deepEqual( model, [] )
+    })
+
+    it( 'type "any" with additional fields', () => {
+      const schema = { name: 'foo' }
+      const model = from( schema )
+
+      assert.deepEqual( model, {} )
+    })
   })
 })
