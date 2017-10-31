@@ -8,7 +8,12 @@ const clone = Mapper()
 
 const Schema = ( type, value, options ) => {
   const { mapper, path } = options
-  const schema = { type, default: typeMap[ type ], id: path }
+  const schema = {
+    type,
+    default: typeMap[ type ],
+    name: type,
+    id: path
+  }
 
   return schema
 }
