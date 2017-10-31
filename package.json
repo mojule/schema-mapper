@@ -1,6 +1,6 @@
 {
   "name": "@mojule/schema-mapper",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Maps between schema and models",
   "main": "index.js",
   "directories": {

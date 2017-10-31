@@ -7,8 +7,8 @@ const typeMap = require( './type-map' )
 const clone = Mapper()
 
 const Schema = ( type, value, options ) => {
-  const { mapper } = options
-  const schema = { type, default: typeMap[ type ] }
+  const { mapper, path } = options
+  const schema = { type, default: typeMap[ type ], id: path }
 
   return schema
 }
@@ -17,17 +17,19 @@ const everySame = arr =>
   arr.length > 0 && arr.every( item => item === arr[ 0 ] )
 
 const array = ( value, options ) => {
-  const { mapper } = options
-
+  const { mapper, path } = options
+  const id = path + '[]'
   const schema = Schema( 'array', value, options )
 
-  schema.items = {}
+  schema.items = { id }
 
   if( value.length === 0 )
     return schema
 
+  const itemOptions = Object.assign( {}, options, { path: id } )
+
   if( value.length === 1 ){
-    schema.items = mapper( value[ 0 ], options )
+    schema.items = mapper( value[ 0 ], itemOptions )
 
     return schema
   }
@@ -36,7 +38,7 @@ const array = ( value, options ) => {
   const jsonMap = {}
 
   value.forEach( current => {
-    const schema = mapper( current, options )
+    const schema = mapper( current, itemOptions )
 
     types.add( schema.type )
     jsonMap[ JSON.stringify( schema ) ] = schema
@@ -55,7 +57,7 @@ const array = ( value, options ) => {
   const { length } = types
 
   if( length === 1 && types[ 0 ] === 'object' ){
-    return arrayObject( schema, value, options )
+    return arrayObject( schema, value, itemOptions )
   }
 
   return schema
@@ -95,7 +97,10 @@ const arrayObject = ( schema, objects, options ) => {
     // leverage the array function to figure out schemas for the property
     const { items: property } = array( propertyValues[ key ], options )
 
+    const path = `${ options.path }.${ key }`
+
     property.name = key
+    property.id = path
 
     obj[ key ] = property
 
@@ -104,7 +109,7 @@ const arrayObject = ( schema, objects, options ) => {
 
   required = Array.from( required )
 
-  schema.items = { type, properties, required }
+  schema.items = { type, properties, required, id: options.path }
 
   return schema
 }
@@ -120,7 +125,9 @@ const map = {
     const { mapper } = options
 
     const properties = Object.keys( value ).reduce( ( obj, key ) => {
-      const property = mapper( value[ key ], options )
+      const path = `${ options.path }.${ key }`
+      const propertyOptions = Object.assign( {}, options, { path } )
+      const property = mapper( value[ key ], propertyOptions )
 
       property.name = key
 
