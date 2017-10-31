@@ -26,7 +26,7 @@ const array = ( value, options ) => {
   const id = path + '[]'
   const schema = Schema( 'array', value, options )
 
-  schema.items = { id }
+  schema.items = { id, name: 'any' }
 
   if( value.length === 0 )
     return schema
@@ -114,7 +114,7 @@ const arrayObject = ( schema, objects, options ) => {
 
   required = Array.from( required )
 
-  schema.items = { type, properties, required, id: options.path }
+  schema.items = { type, properties, required, id: options.path, name: type }
 
   return schema
 }
