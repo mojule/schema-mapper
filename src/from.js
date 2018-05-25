@@ -1,6 +1,6 @@
 'use strict'
 
-const is = require( '@mojule/is' )
+const { is } = require( '@mojule/is' )
 
 const typeMap = require( './type-map' )
 
@@ -17,20 +17,25 @@ const predicates = {
   anySchema: value => is.object( value )
 }
 
+const getDefault = ( value, options, fallback ) =>
+  options.omitDefault ? fallback : value.default || fallback
+
 const map = {
-  stringSchema: () => typeMap.string,
-  numberSchema: () => typeMap.number,
-  booleanSchema: () => typeMap.boolean,
+  stringSchema: ( value, options ) => getDefault( value, options, typeMap.string ),
+  numberSchema: ( value, options ) => getDefault( value, options, typeMap.number ),
+  booleanSchema: ( value, options ) => getDefault( value, options, typeMap.boolean ),
   nullSchema: () => typeMap.null,
   arraySchema: ( value, options ) => {
     const { mapper } = options
+
+    if( !options.omitDefault && value.default ) return value.default
 
     if( value.items ) return [ mapper( value.items, options ) ]
 
     return typeMap.array
   },
   objectSchema: ( value, options ) => {
-    if( is.object( value.properties ) && !is.empty( value.properties ) ){
+    if( is.object( value.properties ) ){
       const { mapper } = options
 
       return Object.keys( value.properties ).reduce( ( obj, key ) => {

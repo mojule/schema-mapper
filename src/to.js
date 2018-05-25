@@ -1,6 +1,6 @@
 'use strict'
 
-const is = require( '@mojule/is' )
+const { is } = require( '@mojule/is' )
 const Mapper = require( '@mojule/mapper' )
 const typeMap = require( './type-map' )
 
@@ -8,11 +8,15 @@ const clone = Mapper()
 
 const Schema = ( type, value, options ) => {
   const { mapper, path } = options
+
   const schema = {
     type,
-    default: typeMap[ type ],
     name: type,
     id: path
+  }
+
+  if( !options.omitDefault && type !== 'object' ){
+    schema.default = value
   }
 
   return schema
@@ -102,7 +106,7 @@ const arrayObject = ( schema, objects, options ) => {
     // leverage the array function to figure out schemas for the property
     const { items: property } = array( propertyValues[ key ], options )
 
-    const path = `${ options.path }.${ key }`
+    const path = `${ options.path }/${ key }`
 
     property.name = key
     property.id = path
@@ -130,7 +134,7 @@ const map = {
     const { mapper } = options
 
     const properties = Object.keys( value ).reduce( ( obj, key ) => {
-      const path = `${ options.path }.${ key }`
+      const path = `${ options.path }/${ key }`
       const propertyOptions = Object.assign( {}, options, { path } )
       const property = mapper( value[ key ], propertyOptions )
 

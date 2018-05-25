@@ -1,18 +1,18 @@
 {
   "name": "@mojule/schema-mapper",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Maps between schema and models",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "@mojule/is": "^0.1.11",
-    "@mojule/mapper": "^0.1.0"
+    "@mojule/is": "^0.3.8",
+    "@mojule/mapper": "^0.1.1"
   },
   "devDependencies": {
-    "mocha": "^4.0.1",
-    "nyc": "^11.3.0",
+    "mocha": "^5.2.0",
+    "nyc": "^11.8.0",
     "tv4": "^1.3.0"
   },
   "scripts": {

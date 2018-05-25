@@ -19,27 +19,90 @@ const schema = to( data )
 ```json
 {
   "type": "object",
-  "default": {
-    "name": "Nik",
-    "age": 37
-  },
+  "name": "object",
+  "id": "",
   "properties": {
     "name": {
       "type": "string",
+      "name": "name",
+      "id": "/name"
+    },
+    "age": {
+      "type": "number",
+      "name": "age",
+      "id": "/age"
+    },
+    "classes": {
+      "type": "array",
+      "name": "classes",
+      "id": "/classes",
+      "items": {
+        "type": "string",
+        "name": "string",
+        "id": "/classes[]"
+      }
+    }
+  }
+}
+```
+
+```javascript
+data = from( schema )
+```
+
+```json
+{
+  "name": "",
+  "age": 0,
+  "classes": [
+    ""
+  ]
+}
+```
+
+```javascript
+const Mapper = require( '@mojule/schema-mapper' )
+
+const { from, to } = Mapper( { omitDefault: false } )
+
+let data = {
+  name: 'Nik',
+  age: 37,
+  classes: [ 'foo', 'bar' ]
+}
+
+const schema = to( data )
+```
+
+```json
+{
+  "type": "object",
+  "name": "object",
+  "id": "",
+  "properties": {
+    "name": {
+      "type": "string",
+      "name": "name",
+      "id": "/name",
       "default": "Nik"
     },
     "age": {
       "type": "number",
+      "name": "age",
+      "id": "/age",
       "default": 37
     },
     "classes": {
       "type": "array",
+      "name": "classes",
+      "id": "/classes",
       "default": [
         "foo",
         "bar"
       ],
       "items": {
-        "type": "string"
+        "id": "/classes[]",
+        "name": "any"
       }
     }
   }
@@ -57,54 +120,6 @@ data = from( schema )
   "classes": [
     "foo",
     "bar"
-  ]
-}
-```
-
-```javascript
-const Mapper = require( '@mojule/schema-mapper' )
-
-const { from, to } = Mapper( { omitDefault: true } )
-
-let data = {
-  name: 'Nik',
-  age: 37,
-  classes: [ 'foo', 'bar' ]
-}
-
-const schema = to( data )
-```
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "name": {
-      "type": "string"
-    },
-    "age": {
-      "type": "number"
-    },
-    "classes": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    }
-  }
-}
-```
-
-```javascript
-data = from( schema )
-```
-
-```json
-{
-  "name": "",
-  "age": 0,
-  "classes": [
-    ""
   ]
 }
 ```
